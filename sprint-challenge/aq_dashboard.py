@@ -40,9 +40,7 @@ class Record(DB.Model):
 
     def __repr__(self):
         return (
-            '<Time {}>'.format(self.datetime)
-            + ' --- ' +
-            '<Value {}>'.format(self.value)
+            '<Time {}> --- <Value {}>'.format(self.datetime, self.value)
             )
 
 
@@ -52,9 +50,11 @@ def refresh():
     DB.drop_all()
     DB.create_all()
     data = datetime_val_data()
+    hldr = []
     for x in range(len(data)):
-        hldr['datetime'], hldr['value'] = data[x]
-        hldr['datetime'] = str(hldr['datetime'])
-        DB.session.add(hldr)
+        hldr_datetime, hldr_value = data[x]
+        hldr_datetime = str(hldr_datetime)
+        inserted = Record(datetime=hldr_datetime, value=hldr_value)
+        DB.session.add(inserted)
     DB.session.commit()
     return 'Data refreshed!'
