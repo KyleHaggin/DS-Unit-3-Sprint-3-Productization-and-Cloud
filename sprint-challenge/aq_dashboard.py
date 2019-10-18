@@ -20,9 +20,14 @@ def datetime_val_data():
     return data
 
 
+def filter():
+    output = Record.query.filter(Record.value >= 10).all()
+    return output
+
+
 @APP.route('/')
 def root():
-    output = datetime_val_data()
+    output = filter()
     return str(output)
 
 
@@ -40,7 +45,7 @@ class Record(DB.Model):
 
     def __repr__(self):
         return (
-            '<Time {}> --- <Value {}>'.format(self.datetime, self.value)
+            'Time {} --- Value {}'.format(self.datetime, self.value)
             )
 
 
