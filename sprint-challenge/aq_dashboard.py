@@ -26,9 +26,10 @@ def root():
     return str(output)
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
-    basedir, 'data.sqlite')
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
+#     basedir, 'data.sqlite')
+APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 DB = SQLAlchemy(APP)
 
 
@@ -38,7 +39,11 @@ class Record(DB.Model):
     value = DB.Column(DB.Float, nullable=False)
 
     def __repr__(self):
-        return '<Time {}>'.format()
+        return (
+            '<Time {}>'.format(self.datetime)
+            + ' --- ' +
+            '<Value {}>'.format(self.value)
+            )
 
 
 @APP.route('/refresh')
@@ -46,6 +51,10 @@ def refresh():
     """Pull fresh data from Open AQ and replace existing data."""
     DB.drop_all()
     DB.create_all()
-    # TODO Get data from OpenAQ, make Record objects with it, and add to db
+    data = datetime_val_data()
+    for x in range(len(data)):
+        hldr['datetime'], hldr['value'] = data[x]
+        hldr['datetime'] = str(hldr['datetime'])
+        DB.session.add(hldr)
     DB.session.commit()
     return 'Data refreshed!'
